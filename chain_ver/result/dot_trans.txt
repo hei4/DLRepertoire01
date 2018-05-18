@@ -1,0 +1,2 @@
+dot -Tpng cg.dot -o cg.png
+

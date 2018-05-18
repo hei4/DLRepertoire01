@@ -32,7 +32,8 @@ def main():
     plt.plot(df['epoch'], df['test/accuracy'], label='test/acc.', marker = "o")
 
     plt.legend(loc='lower right')
-    plt.ylim([0.0, 1.0])
+    plt.ylim([0.8, 1.0])
+    plt.savefig('accuracy.png')
     plt.show()
 
     transform = transforms.Compose(
@@ -86,6 +87,7 @@ def main():
     plt.xlabel('predicted label')
     plt.ylabel('true label')
     plt.tight_layout()
+    plt.savefig('confusion_matrix.png')
     plt.show()
 
 
