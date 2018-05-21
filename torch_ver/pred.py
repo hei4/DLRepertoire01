@@ -65,6 +65,7 @@ def main():
     with torch.no_grad():
         for data in dataloader:
             images, labels = data
+            
             true_list.extend(labels.tolist())
             images, labels = images.to(device), labels.to(device)  # for GPU
 

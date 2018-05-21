@@ -34,6 +34,15 @@ def main():
 
     trainset = torchvision.datasets.MNIST(root='./data', train=True,
                                           download=True, transform=transform)
+    # trainset...
+    # <class 'object'>
+    #     <class 'torch.utils.data.dataset.Dataset'>
+    #         <class 'torchvision.datasets.mnist.MNIST'>
+    
+    # trainset[0][0]...
+    # <class 'object'>
+    #     <class 'torch._C._TensorBase'>
+    #         <class 'torch.Tensor'> torch.Size([1, 28, 28])
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                               shuffle=True, num_workers=2)
@@ -67,6 +76,12 @@ def main():
         for i, data in enumerate(trainloader, 0):
             # get the inputs
             inputs, labels = data
+            
+            # inputs...
+            # <class 'object'>
+            #     <class 'torch._C._TensorBase'>
+            #         <class 'torch.Tensor'> torch.Size([100, 1, 28, 28])
+            
             train_true.extend(labels.tolist())
 
             inputs, labels = inputs.to(device), labels.to(device)   # for GPU
