@@ -5,7 +5,7 @@ import tensorflow as tf
 BASE_CHANNEL = 32
 HIDDEN_UNITS = 256
 CLASS_NUM = 10
-EPOCH = 500
+EPOCH = 20
 BATCH_SIZE = 100
 
 
@@ -44,13 +44,14 @@ d_test = d_mod[5000:6000]
 x_ = tf.placeholder(tf.float32, [None, 784])
 d_ = tf.placeholder(tf.float32, [None, 10])
 x_image = tf.reshape(x_, [-1, 28, 28, 1])#reshape for convolution
-
+tf.summary.image('input_img', x_image, 10)
 
 with tf.name_scope("conv1"):
     w1 = tf.Variable(tf.truncated_normal([3, 3, 1, BASE_CHANNEL], mean=0.0, stddev=0.05), dtype=tf.float32)
     b1 = tf.Variable(tf.zeros([BASE_CHANNEL]), dtype=tf.float32)
     conv1 = tf.nn.conv2d(x_image, w1, strides=[1, 1, 1, 1], padding="SAME") + b1
     relu1 = tf.nn.relu(conv1)
+    tf.summary.histogram('W1', w1)
 
 with tf.name_scope("pool1"):
     pool1 = tf.nn.max_pool(relu1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
@@ -88,11 +89,13 @@ train_step = tf.train.AdamOptimizer(0.001).minimize(loss)
 with tf.name_scope("accuracy"):
     correct_prediction = tf.equal(tf.argmax(prob, 1), tf.argmax(d_, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    tf.summary.scalar('Accuracy', accuracy)
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-writer = tf.summary.FileWriter('data10', sess.graph)
+summary = tf.summary.merge_all()
+writer = tf.summary.FileWriter('data20', sess.graph)
 
 #make minibatch
 def make_minibatch(per_list, x_data, d_data):
@@ -109,13 +112,15 @@ for epoch in range(EPOCH):
         x_minibatch, d_minibatch = make_minibatch(batch_1_list, x_train, d_train)
 
         sess.run(train_step, feed_dict={x_: x_minibatch, d_: d_minibatch})
-    
-    
+
     loss_, accu_ = sess.run([loss, accuracy], feed_dict={x_: x_train, d_: d_train})
     print('epoch =' + str(epoch) + ' ,training loss =' + str(loss_), ' ,training accuracy =', str(accu_))
 
     #test phase
-    if epoch % 10 == 0:
+    if epoch % 4 == 0:
         loss_test_, accu_test_= sess.run([loss, accuracy], feed_dict={x_: x_test, d_: d_test})
         print('test loss = ', str(loss_test_), ' ,test accuracy', str(accu_test_))
+        summary_ = sess.run(summary, feed_dict={x_: x_test, d_: d_test})
+        writer.add_summary(summary_, epoch)
+
 
